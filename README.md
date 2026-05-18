@@ -34,6 +34,13 @@ python -m pip install "gymnasium[box2d]"
 
 If `conda` is not available in PowerShell, run `conda init powershell` once in Anaconda Prompt or Miniconda Prompt, then reopen PowerShell.
 
+### To install stable_baselines 3
+
+```powershell
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu132 #Only needed to work with nvidia gpus
+pip install 'stable-baselines3[extra]'
+```
+
 ## Run
 
 Run the demo:
