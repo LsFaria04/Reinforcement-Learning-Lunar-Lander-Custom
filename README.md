@@ -47,6 +47,13 @@ python -m pip install swig
 python -m pip install "gymnasium[box2d]"
 ```
 
+
+### To install stable_baselines 3
+
+```powershell
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu132 #Only needed to work with nvidia gpus
+pip install 'stable-baselines3[extra]'
+```
 ### To run the project
 
 Run the main demo with LunarLander:
