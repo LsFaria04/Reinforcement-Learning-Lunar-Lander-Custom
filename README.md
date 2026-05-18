@@ -1,45 +1,30 @@
 # Reinforcement-Learning
 
-### Python Version Requirement
+This project experiments with the `LunarLander-v3` environment from Gymnasium. It includes:
 
-This project requires **Python 3.13** or earlier (3.10-3.13).
+- the original environment
+- a custom wrapper with reward shaping
+- an optional random-spawn mode for the custom wrapper
 
-### To create or update the virtual environment
+## Requirements
 
-If you don't have the environment yet, create it with Python 3.13:
+Use **Python 3.10-3.13**. `LunarLander` needs the Box2D extras.
+
+## Setup
+
+Create the environment:
 
 ```powershell
 conda create -n Reinforcement-Learning python=3.13
 ```
 
-If you already have the environment but it's on Python 3.14, recreate it:
-
-```powershell
-conda remove -n Reinforcement-Learning --all
-conda create -n Reinforcement-Learning python=3.13
-```
-
-### To activate the virtual environment
-
-If you have conda installed and initialized in your shell:
+Activate it:
 
 ```powershell
 conda activate Reinforcement-Learning
 ```
 
-If `conda` is not recognized, open the Anaconda Prompt or Miniconda Prompt once and run:
-
-```powershell
-conda init powershell
-```
-
-Then close and reopen PowerShell before running `conda activate Reinforcement-Learning`.
-
-You can also use the Anaconda Prompt or Miniconda Prompt if you prefer not to initialize PowerShell.
-
-### To install the base gymnasium library
-
-Make sure the environment is active first, then run:
+Install dependencies:
 
 ```powershell
 python -m pip install gymnasium
@@ -47,61 +32,64 @@ python -m pip install swig
 python -m pip install "gymnasium[box2d]"
 ```
 
-### To run the project
+If `conda` is not available in PowerShell, run `conda init powershell` once in Anaconda Prompt or Miniconda Prompt, then reopen PowerShell.
 
-Run the main demo with LunarLander:
+## Run
+
+Run the demo:
 
 ```powershell
 python main.py
 ```
 
-This will open a window showing the agent interacting with the environment.
-
-### Switching Between Original and Custom Environments
-
-**To use the original LunarLander-v3 (unmodified):**
-
-Edit `main.py` and use:
-```python
-env = gym.make("LunarLander-v3", ...)
-```
-
-**To use the custom LunarLander (with reward modifications):**
-
-Edit `main.py` and use:
-```python
-from environment_creation import CUSTOM_ENV_ID, register_custom_lunar_lander
-
-register_custom_lunar_lander()
-env = gym.make(CUSTOM_ENV_ID, ...)
-```
-
-### Customizing the Environment
-
-The custom environment reward function is defined in `environment_creation.py`. You can modify rewards by changing the `RewardTweaks` class:
+`main.py` uses a single selector:
 
 ```python
-@dataclass
-class RewardTweaks:
-    distance_penalty: float = 1.0        # Penalty for distance from landing pad
-    velocity_penalty: float = 1.0        # Penalty for speed
-    angle_penalty: float = 1.0           # Penalty for tilt angle
-    contact_bonus: float = 0.0           # Bonus for leg contact with ground
-    landing_bonus: float = 0.0           # Bonus for safe landing
-    crash_penalty: float = 0.0           # Penalty for crashing
+ENV_SELECTION = "custom"  # or "original"
 ```
 
-**Example: Make landing easier by reducing distance penalty and adding landing bonus:**
+## Choose the environment in `main.py`
+
+Use `ENV_SELECTION = "original"` to run the unmodified `LunarLander-v3`.
+
+Use `ENV_SELECTION = "custom"` to run the custom wrapper. The custom options live in `CUSTOM_ENV_OPTIONS`:
 
 ```python
-@dataclass
-class RewardTweaks:
-    distance_penalty: float = 0.5        # Reduced from 1.0
-    velocity_penalty: float = 1.0
-    angle_penalty: float = 1.0
-    contact_bonus: float = 0.0
-    landing_bonus: float = 50.0          # Added bonus
-    crash_penalty: float = 0.0
+CUSTOM_ENV_OPTIONS = {
+    "render_mode": "human",
+    "random_spawn": True,
+    "gravity": -10.0,
+    "enable_wind": False,
+    "wind_power": 15.0,
+    "turbulence_power": 1.5,
+}
 ```
 
-These tweaks are applied in the `step()` method to modify the base reward from the environment.
+## Tweak the custom environment
+
+The custom behavior is defined in `environment_creation.py` inside `CustomLunarLander`.
+
+Change these if you want to diverge from the original environment:
+
+- `gravity`, `enable_wind`, `wind_power`, `turbulence_power` for physics
+- `random_spawn` to ignore reset seeds and keep the start state stochastic
+- `RewardTweaks` to change the shaped reward
+
+The helper `create_custom_lunar_lander(...)` is the recommended way to build the custom env from code.
+
+Example:
+
+```python
+from environment_creation import create_custom_lunar_lander
+
+env = create_custom_lunar_lander(
+    render_mode="human",
+    random_spawn=True,
+    gravity=-8.0,
+)
+```
+
+## Files to edit
+
+- [main.py](main.py) controls which environment variant is used for a run.
+- [environment_creation.py](environment_creation.py) controls the custom environment behavior.
