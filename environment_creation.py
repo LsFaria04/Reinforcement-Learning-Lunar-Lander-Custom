@@ -163,19 +163,16 @@ class CustomLunarLander(gym.Env):
         base_env = self.env.unwrapped
         pos = base_env.lander.position
         vel = base_env.lander.linearVelocity
-        return (
-            [
-                (pos.x - VIEWPORT_W / SCALE / 2.0) / (VIEWPORT_W / SCALE / 2.0),
-                (pos.y - (base_env.helipad_y + LEG_DOWN / SCALE)) / (VIEWPORT_H / SCALE / 2.0),
-                vel.x * (VIEWPORT_W / SCALE / 2.0) / FPS,
-                vel.y * (VIEWPORT_H / SCALE / 2.0) / FPS,
-                base_env.lander.angle,
-                20.0 * base_env.lander.angularVelocity / FPS,
-                1.0 if base_env.legs[0].ground_contact else 0.0,
-                1.0 if base_env.legs[1].ground_contact else 0.0,
-            ],
-            {},
-        )
+        return [
+            (pos.x - VIEWPORT_W / SCALE / 2.0) / (VIEWPORT_W / SCALE / 2.0),
+            (pos.y - (base_env.helipad_y + LEG_DOWN / SCALE)) / (VIEWPORT_H / SCALE / 2.0),
+            vel.x * (VIEWPORT_W / SCALE / 2.0) / FPS,
+            vel.y * (VIEWPORT_H / SCALE / 2.0) / FPS,
+            base_env.lander.angle,
+            20.0 * base_env.lander.angularVelocity / FPS,
+            1.0 if base_env.legs[0].ground_contact else 0.0,
+            1.0 if base_env.legs[1].ground_contact else 0.0,
+        ]
 
     def render(self):
         return self.env.render()
@@ -204,7 +201,9 @@ register_custom_lunar_lander()
 
 def create_original_lunar_lander(render_mode: str | None = None) -> gym.Env:
     """Create the unmodified LunarLander baseline environment."""
-    return gym.make(ORIGINAL_ENV_ID, render_mode=render_mode, **BASE_ENV_KWARGS)
+    env_kwargs = dict(BASE_ENV_KWARGS)
+    env_kwargs["render_mode"] = render_mode
+    return gym.make(BASE_ENV_ID, **env_kwargs)
 
 
 def create_custom_lunar_lander(
