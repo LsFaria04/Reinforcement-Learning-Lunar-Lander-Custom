@@ -15,8 +15,6 @@ from environment_creation import (
     CUSTOM_ENV_ID,
 )
 
-ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
-
 CUSTOM_ENV_OPTIONS = {
     "render_mode": None,
     "random_spawn": True,
@@ -26,10 +24,12 @@ CUSTOM_ENV_OPTIONS = {
     "turbulence_power": 1.5,
 }
 
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
 SEED = 42
-NUM_ENVS = 20
-NUM_STEPS = 10000
-TOTAL_TIMESTEPS = 3_000_000
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
 EVAL_EPISODES = 100
 
 POLICY_KWARGS = {
@@ -41,6 +41,8 @@ DQN_KWARGS = {
     "buffer_size": 1_000_000,
     "learning_starts": 10_000,
     "batch_size": 64,
+    "tau": 1.0,
+    "gamma": 0.99,
     "train_freq": 1,
     "gradient_steps": 1,
     "target_update_interval": 1_000,
@@ -124,9 +126,6 @@ def train_agent(train_env: VecEnv) -> DQN:
         print("Training on GPU with CUDA support.")
         print("Your GPU is: ", torch.cuda.get_device_name(0))
         print("CUDA version: ", torch.version.cuda)
-        torch.backends.cudnn.benchmark = True
-        if hasattr(torch, "set_float32_matmul_precision"):
-            torch.set_float32_matmul_precision("high")
     else:
         print("Training on CPU (no CUDA support detected).")
     
@@ -208,6 +207,7 @@ def run_demo(*, train: bool = True, model_path: str = "dqn_lunar_lander") -> Non
         f"Evaluated trained agent over {EVAL_EPISODES} episodes: mean reward = {mean_reward:.2f} +/- {std_reward:.2f}"
     )
 
+    '''
     demo_env = create_vec_env(
         seed=SEED + 2,
         render_mode="human",
@@ -230,12 +230,13 @@ def run_demo(*, train: bool = True, model_path: str = "dqn_lunar_lander") -> Non
             episode += 1
             episode_reward = 0.0
             observation = demo_env.reset()
-
+    '''
     print("Finished running LunarLander-v3")
     if train_env is not None:
         train_env.close()
     eval_env.close()
-    demo_env.close()
+    #demo_env.close()
+
 
 
 if __name__ == "__main__":
