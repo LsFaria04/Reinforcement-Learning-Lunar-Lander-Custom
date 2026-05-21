@@ -129,7 +129,7 @@ def train_agent(train_env: VecEnv) -> DQN:
             torch.set_float32_matmul_precision("high")
     else:
         print("Training on CPU (no CUDA support detected).")
-
+    
     model = DQN(
         "MlpPolicy",
         train_env,
@@ -142,23 +142,45 @@ def train_agent(train_env: VecEnv) -> DQN:
         total_timesteps=TOTAL_TIMESTEPS,
         progress_bar=True,
     )
+    
     model.save("dqn_lunar_lander")
+
     return model
 
+def load_agent(model_path: str = "dqn_lunar_lander") -> DQN:
+    """Load a trained RL agent from the specified path."""
+    cuda_available = False
+    try:
+        cuda_available = torch.cuda.is_available()
+    except RuntimeError as e:
+        print(f"Warning: Could not check CUDA availability due to error: {e}")
+        print("Defaulting to CPU loading.")
+    device = "cuda" if cuda_available else "cpu"
+    if device == "cuda":
+        print("Loading model on GPU with CUDA support.")
+        print("Your GPU is: ", torch.cuda.get_device_name(0))
+        print("CUDA version: ", torch.version.cuda)
+    else:
+        print("Loading model on CPU (no CUDA support detected).")
+    
+    model = DQN.load(model_path, device=device)
+    return model
 
-def run_demo() -> None:
-    """Train, evaluate, and render a policy against the selected LunarLander env."""
+def run_demo(*, train: bool = True, model_path: str = "dqn_lunar_lander") -> None:
+    """Train or load, then evaluate and render a policy against the selected env."""
 
     set_random_seed(SEED)
     np.random.seed(SEED)
     torch.manual_seed(SEED)
 
-    train_env = create_vec_env(
-        seed=SEED,
-        render_mode=None,
-        random_spawn=None,
-        num_envs=NUM_ENVS,
-    )
+    train_env = None
+    if train:
+        train_env = create_vec_env(
+            seed=SEED,
+            render_mode=None,
+            random_spawn=None,
+            num_envs=NUM_ENVS,
+        )
     eval_env = create_vec_env(
         seed=SEED + 1,
         render_mode=None,
@@ -171,7 +193,11 @@ def run_demo() -> None:
     if ENV_SELECTION == "custom":
         print(f"Custom options: {CUSTOM_ENV_OPTIONS}")
 
-    model = train_agent(train_env)
+    if train:
+        model = train_agent(train_env)
+    else:
+        model = load_agent(model_path)
+
     mean_reward, std_reward = evaluate_policy(
         model,
         eval_env,
@@ -206,7 +232,8 @@ def run_demo() -> None:
             observation = demo_env.reset()
 
     print("Finished running LunarLander-v3")
-    train_env.close()
+    if train_env is not None:
+        train_env.close()
     eval_env.close()
     demo_env.close()
 
