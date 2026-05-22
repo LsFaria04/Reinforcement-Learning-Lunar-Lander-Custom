@@ -24,6 +24,7 @@ CUSTOM_ENV_OPTIONS = {
     "turbulence_power": 1.5,
 }
 
+
 ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
 
 SEED = 42
@@ -45,12 +46,13 @@ DQN_KWARGS = {
     "gamma": 0.99,
     "train_freq": 1,
     "gradient_steps": 1,
-    "target_update_interval": 1_000,
+    "target_update_interval": 5000,
     "exploration_fraction": 0.1,
     "exploration_final_eps": 0.05,
     "max_grad_norm": 10.0,
     "policy_kwargs": POLICY_KWARGS,
 }
+
 
 
 def _make_env_options(*, render_mode: str | None, random_spawn: bool | None) -> dict:
