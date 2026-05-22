@@ -22,18 +22,18 @@ CUSTOM_ENV_OPTIONS = {
     "enable_wind": False,
     "wind_power": 15.0,
     "turbulence_power": 1.5,
-    "random_spawn_x_range": (-0.9, 0.9),
-    "noise_std": 0.1
+    "random_spawn_x_range": (-0.6, 0.6),
+    "noise_std": 0.005 # noise to x, y, vx, vy, and angle observations
 }
 
 
-ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
 
 SEED = 42
-NUM_ENVS = 16
+NUM_ENVS = 60
 NUM_STEPS = 1000
-TOTAL_TIMESTEPS = 1_000_000
-EVAL_EPISODES = 100
+TOTAL_TIMESTEPS = 5_000_000
+EVAL_EPISODES = 1000
 
 POLICY_KWARGS = {
     "net_arch": [256, 256],
@@ -244,4 +244,4 @@ def run_demo(*, train: bool = True, model_path: str = "dqn_lunar_lander") -> Non
 
 
 if __name__ == "__main__":
-    run_demo(train=False, model_path="runs/original/hyperParameters/original_baseline.zip")
+    run_demo(train=True, model_path="runs/custom/custom_baseline.zip")

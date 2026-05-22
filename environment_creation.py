@@ -37,9 +37,9 @@ CUSTOM_ENV_DEFAULTS = {
 
 @dataclass
 class RewardTweaks:
-    distance_penalty: float = 1.0
-    velocity_penalty: float = 1.0
-    angle_penalty: float = 1.0
+    distance_penalty: float = 0.0
+    velocity_penalty: float = 0.0
+    angle_penalty: float = 0.0
     contact_bonus: float = 0.0
     landing_bonus: float = 0.0
     crash_penalty: float = 0.0
@@ -127,9 +127,32 @@ class CustomLunarLander(gym.Env):
 
         return shaped_reward
 
+    def _add_observation_noise(self, observation):
+        observation = np.asarray(observation, dtype=np.float32).copy()
+
+        if self.noise_std <= 0:
+            return observation
+
+        # Add noise only to continuous state variables:
+        # x, y, vx, vy, angle, angular_velocity
+        continuous_indices = [0, 1, 2, 3, 4, 5]
+
+        observation[continuous_indices] += self.env.unwrapped.np_random.normal(
+            loc=0.0,
+            scale=self.noise_std,
+            size=len(continuous_indices),
+        )
+
+        # Keep leg-contact indicators exactly binary.
+        observation[6] = float(observation[6] >= 0.5)
+        observation[7] = float(observation[7] >= 0.5)
+
+        return observation
+
+
     def step(self, action):
         observation, reward, terminated, truncated, info = self.env.step(action)
-        observation = observation + np.random.normal(0, self.noise_std, size=observation.shape)
+        observation = self._add_observation_noise(observation)
         shaped_reward = self._shape_reward(observation, reward, terminated)
 
         info = dict(info)
