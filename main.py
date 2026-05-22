@@ -22,6 +22,8 @@ CUSTOM_ENV_OPTIONS = {
     "enable_wind": False,
     "wind_power": 15.0,
     "turbulence_power": 1.5,
+    "random_spawn_x_range": (-0.9, 0.9),
+    "noise_std": 0.1
 }
 
 
@@ -242,4 +244,4 @@ def run_demo(*, train: bool = True, model_path: str = "dqn_lunar_lander") -> Non
 
 
 if __name__ == "__main__":
-    run_demo()
+    run_demo(train=False, model_path="runs/original/hyperParameters/original_baseline.zip")

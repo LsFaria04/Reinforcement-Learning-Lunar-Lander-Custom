@@ -1,9 +1,9 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
+from gymnasium.envs.registration import register, registry
 
 import gymnasium as gym
-from gymnasium.envs.registration import register, registry
+import numpy as np
 
 
 BASE_ENV_ID = "LunarLander-v3"
@@ -31,7 +31,7 @@ CUSTOM_ENV_DEFAULTS = {
     "wind_power": 15.0,
     "turbulence_power": 1.5,
     "random_spawn": True,
-    "random_spawn_x_range": (-0.6, 0.6),
+    "random_spawn_x_range": (-0.9, 0.9), # Add stronger horizontal spawn range
 }
 
 
@@ -88,6 +88,7 @@ class CustomLunarLander(gym.Env):
         random_spawn: bool = False,
         random_spawn_x_range: tuple[float, float] = (-0.6, 0.6),
         reward_tweaks: RewardTweaks | None = None,
+        noise_std: float = 0.1,
     ):
         self.env = _make_lunar_lander(
             render_mode=render_mode,
@@ -103,6 +104,7 @@ class CustomLunarLander(gym.Env):
         self.action_space = self.env.action_space
         self.observation_space = self.env.observation_space
         self.render_mode = render_mode
+        self.noise_std = noise_std
 
     def _shape_reward(
         self,
@@ -127,6 +129,7 @@ class CustomLunarLander(gym.Env):
 
     def step(self, action):
         observation, reward, terminated, truncated, info = self.env.step(action)
+        observation = observation + np.random.normal(0, self.noise_std, size=observation.shape)
         shaped_reward = self._shape_reward(observation, reward, terminated)
 
         info = dict(info)
@@ -215,9 +218,10 @@ def create_custom_lunar_lander(
     wind_power: float = 15.0,
     turbulence_power: float = 1.5,
     random_spawn: bool = True,
+    random_spawn_x_range: tuple[float, float] = (-0.9, 0.9),
     reward_tweaks: RewardTweaks | None = None,
+    noise_std: float = 0.1,
 ) -> CustomLunarLander:
-    """Create the custom LunarLander with explicit override points."""
     return CustomLunarLander(
         render_mode=render_mode,
         continuous=continuous,
@@ -226,6 +230,7 @@ def create_custom_lunar_lander(
         wind_power=wind_power,
         turbulence_power=turbulence_power,
         random_spawn=random_spawn,
+        random_spawn_x_range=random_spawn_x_range,
         reward_tweaks=reward_tweaks,
+        noise_std=noise_std,
     )
-
