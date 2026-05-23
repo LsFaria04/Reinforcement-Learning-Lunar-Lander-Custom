@@ -903,3 +903,220 @@ DQN_KWARGS = {
 ```
 
 Evaluated trained agent over 100 episodes: mean reward = 181.62 +/- 97.82
+
+#### Run 25
+
+Changes tau
+
+```python
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+DQN_KWARGS = {
+    "learning_rate": 1e-3,
+    "buffer_size": 1_000_000,
+    "learning_starts": 10_000,
+    "batch_size": 64,
+    "tau": 0.5,
+    "gamma": 0.99,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "target_update_interval": 5000,
+    "exploration_fraction": 0.1,
+    "exploration_final_eps": 0.05,
+    "max_grad_norm": 10.0,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 217.31 +/- 71.58
+
+#### Run 26
+
+Changes tau
+
+```python
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+DQN_KWARGS = {
+    "learning_rate": 1e-3,
+    "buffer_size": 1_000_000,
+    "learning_starts": 10_000,
+    "batch_size": 64,
+    "tau": 0.1,
+    "gamma": 0.99,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "target_update_interval": 5000,
+    "exploration_fraction": 0.1,
+    "exploration_final_eps": 0.05,
+    "max_grad_norm": 10.0,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = -16.62 +/- 95.23
+
+#### Run 27
+
+Changes tau
+
+```python
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+DQN_KWARGS = {
+    "learning_rate": 1e-3,
+    "buffer_size": 1_000_000,
+    "learning_starts": 10_000,
+    "batch_size": 64,
+    "tau": 0.01,
+    "gamma": 0.99,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "target_update_interval": 5000,
+    "exploration_fraction": 0.1,
+    "exploration_final_eps": 0.05,
+    "max_grad_norm": 10.0,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = -18.11 +/- 176.77
+
+#### Run 28
+
+Changes gamma
+
+```python
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+DQN_KWARGS = {
+    "learning_rate": 1e-3,
+    "buffer_size": 1_000_000,
+    "learning_starts": 10_000,
+    "batch_size": 64,
+    "tau": 1.0,
+    "gamma": 0.98,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "target_update_interval": 5000,
+    "exploration_fraction": 0.1,
+    "exploration_final_eps": 0.05,
+    "max_grad_norm": 10.0,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 107.91 +/- 102.59
+
+
+#### Run 29
+
+Changes gamma
+
+```python
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+DQN_KWARGS = {
+    "learning_rate": 1e-3,
+    "buffer_size": 1_000_000,
+    "learning_starts": 10_000,
+    "batch_size": 64,
+    "tau": 1.0,
+    "gamma": 0.5,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "target_update_interval": 5000,
+    "exploration_fraction": 0.1,
+    "exploration_final_eps": 0.05,
+    "max_grad_norm": 10.0,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 17.35 +/- 178.67
+
+#### Run 30
+
+Changes gamma
+
+```python
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+DQN_KWARGS = {
+    "learning_rate": 1e-3,
+    "buffer_size": 1_000_000,
+    "learning_starts": 10_000,
+    "batch_size": 64,
+    "tau": 1.0,
+    "gamma": 0.995,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "target_update_interval": 5000,
+    "exploration_fraction": 0.1,
+    "exploration_final_eps": 0.05,
+    "max_grad_norm": 10.0,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 195.45 +/- 88.89

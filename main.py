@@ -27,13 +27,13 @@ CUSTOM_ENV_OPTIONS = {
 }
 
 
-ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
 
 SEED = 42
-NUM_ENVS = 60
+NUM_ENVS = 16
 NUM_STEPS = 1000
-TOTAL_TIMESTEPS = 5_000_000
-EVAL_EPISODES = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
 
 POLICY_KWARGS = {
     "net_arch": [256, 256],
@@ -45,7 +45,7 @@ DQN_KWARGS = {
     "learning_starts": 10_000,
     "batch_size": 64,
     "tau": 1.0,
-    "gamma": 0.99,
+    "gamma": 0.995,
     "train_freq": 1,
     "gradient_steps": 1,
     "target_update_interval": 5000,
