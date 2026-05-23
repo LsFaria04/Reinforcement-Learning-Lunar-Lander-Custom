@@ -32,7 +32,7 @@ ENV_SELECTION = "original"  # Set to "original" to use the unmodified environmen
 SEED = 42
 NUM_ENVS = 16
 NUM_STEPS = 1000
-TOTAL_TIMESTEPS = 1_000_000
+TOTAL_TIMESTEPS = 5_000_000
 EVAL_EPISODES = 100
 
 POLICY_KWARGS = {
@@ -43,18 +43,17 @@ DQN_KWARGS = {
     "learning_rate": 1e-3,
     "buffer_size": 1_000_000,
     "learning_starts": 10_000,
-    "batch_size": 64,
+    "batch_size": 128,
     "tau": 1.0,
-    "gamma": 0.995,
+    "gamma": 0.99,
     "train_freq": 1,
     "gradient_steps": 1,
-    "target_update_interval": 5000,
+    "target_update_interval": 1_000,
     "exploration_fraction": 0.1,
     "exploration_final_eps": 0.05,
     "max_grad_norm": 10.0,
     "policy_kwargs": POLICY_KWARGS,
 }
-
 
 
 def _make_env_options(*, render_mode: str | None, random_spawn: bool | None) -> dict:
