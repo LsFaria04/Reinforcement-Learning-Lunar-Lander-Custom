@@ -1152,3 +1152,5 @@ DQN_KWARGS = {
     "policy_kwargs": POLICY_KWARGS,
 }
 ```
+
+Evaluated trained agent over 100 episodes: mean reward = 280.60 +/- 22.18
