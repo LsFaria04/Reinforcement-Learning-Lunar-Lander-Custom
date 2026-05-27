@@ -53,6 +53,8 @@ python main.py
 
 ```python
 ENV_SELECTION = "custom"  # or "original"
+
+ALGORITHM_SELECTION = "dqn"  # or "ppo"
 ```
 
 ## Choose the environment in `main.py`
