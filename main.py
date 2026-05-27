@@ -13,6 +13,7 @@ from environment_creation import (
     create_custom_lunar_lander,
     create_original_lunar_lander,
     CUSTOM_ENV_ID,
+    RewardTweaks,
 )
 
 CUSTOM_ENV_OPTIONS = {
@@ -23,14 +24,15 @@ CUSTOM_ENV_OPTIONS = {
     "wind_power": 15.0,
     "turbulence_power": 1.5,
     "random_spawn_x_range": (-0.6, 0.6),
-    "noise_std": 0.005 # noise to x, y, vx, vy, and angle observations
+    "noise_std": 0.005, # noise to x, y, vx, vy, and angle observations
+    "reward_tweaks": RewardTweaks(fuel_bonus=50.0),
 }
 
 
-ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
 
 SEED = 42
-NUM_ENVS = 16
+NUM_ENVS = 15
 NUM_STEPS = 1000
 TOTAL_TIMESTEPS = 5_000_000
 EVAL_EPISODES = 100
