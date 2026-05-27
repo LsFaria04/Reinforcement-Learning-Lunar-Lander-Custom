@@ -3,7 +3,8 @@ from functools import partial
 import gymnasium as gym
 import numpy as np
 import torch
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO
+from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.utils import set_random_seed
@@ -26,6 +27,7 @@ CUSTOM_ENV_OPTIONS = {
     "noise_std": 0.005 # noise to x, y, vx, vy, and angle observations
 }
 
+ALGORITHM_SELECTION = "dqn"  # Options: "dqn", "ppo"
 
 ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
 
@@ -37,6 +39,20 @@ EVAL_EPISODES = 100
 
 POLICY_KWARGS = {
     "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 1e-3,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 20,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.01,
+    "vf_coef": 0.7,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
 }
 
 DQN_KWARGS = {
@@ -54,6 +70,31 @@ DQN_KWARGS = {
     "max_grad_norm": 10.0,
     "policy_kwargs": POLICY_KWARGS,
 }
+
+ALGORITHM_CONFIGS = {
+    "dqn": {
+        "cls": DQN,
+        "kwargs": DQN_KWARGS,
+        "save_path": "dqn_lunar_lander",
+    },
+    "ppo": {
+        "cls": PPO,
+        "kwargs": PPO_KWARGS,
+        "save_path": "ppo_lunar_lander",
+    },
+}
+
+
+
+
+def _get_algorithm_config() -> tuple[type[BaseAlgorithm], dict, str]:
+    config = ALGORITHM_CONFIGS.get(ALGORITHM_SELECTION)
+    if config is None:
+        valid = ", ".join(sorted(ALGORITHM_CONFIGS))
+        raise ValueError(
+            f"Unknown ALGORITHM_SELECTION={ALGORITHM_SELECTION!r}. Use one of: {valid}."
+        )
+    return config["cls"], config["kwargs"], config["save_path"]
 
 
 def _make_env_options(*, render_mode: str | None, random_spawn: bool | None) -> dict:
@@ -115,7 +156,7 @@ def create_vec_env(
     vec_env_cls = SubprocVecEnv if use_subproc else DummyVecEnv
     return vec_env_cls(env_fns)
 
-def train_agent(train_env: VecEnv) -> DQN:
+def train_agent(train_env: VecEnv) -> BaseAlgorithm:
     """Train an RL agent on the provided environment."""
 
     cuda_available = False
@@ -124,7 +165,9 @@ def train_agent(train_env: VecEnv) -> DQN:
     except RuntimeError as e:
         print(f"Warning: Could not check CUDA availability due to error: {e}")
         print("Defaulting to CPU training.")
-    device = "cuda" if cuda_available else "cpu"
+    if cuda_available:
+        print("CUDA is available")
+    device = "cuda" if cuda_available and ALGORITHM_SELECTION == "dqn" else "cpu"
     if device == "cuda":
         print("Training on GPU with CUDA support.")
         print("Your GPU is: ", torch.cuda.get_device_name(0))
@@ -132,24 +175,25 @@ def train_agent(train_env: VecEnv) -> DQN:
     else:
         print("Training on CPU (no CUDA support detected).")
     
-    model = DQN(
+    model_cls, algo_kwargs, save_path = _get_algorithm_config()
+    model = model_cls(
         "MlpPolicy",
         train_env,
         verbose=0,
         device=device,
         seed=SEED,
-        **DQN_KWARGS,
+        **algo_kwargs,
     )
     model.learn(
         total_timesteps=TOTAL_TIMESTEPS,
         progress_bar=True,
     )
-    
-    model.save("dqn_lunar_lander")
+
+    model.save(save_path)
 
     return model
 
-def load_agent(model_path: str = "dqn_lunar_lander") -> DQN:
+def load_agent(model_path: str | None = None) -> BaseAlgorithm:
     """Load a trained RL agent from the specified path."""
     cuda_available = False
     try:
@@ -157,7 +201,7 @@ def load_agent(model_path: str = "dqn_lunar_lander") -> DQN:
     except RuntimeError as e:
         print(f"Warning: Could not check CUDA availability due to error: {e}")
         print("Defaulting to CPU loading.")
-    device = "cuda" if cuda_available else "cpu"
+    device = "cuda" if cuda_available and ALGORITHM_SELECTION == "dqn" else "cpu"
     if device == "cuda":
         print("Loading model on GPU with CUDA support.")
         print("Your GPU is: ", torch.cuda.get_device_name(0))
@@ -165,10 +209,11 @@ def load_agent(model_path: str = "dqn_lunar_lander") -> DQN:
     else:
         print("Loading model on CPU (no CUDA support detected).")
     
-    model = DQN.load(model_path, device=device)
+    model_cls, _algo_kwargs, default_path = _get_algorithm_config()
+    model = model_cls.load(model_path or default_path, device=device)
     return model
 
-def run_demo(*, train: bool = True, model_path: str = "dqn_lunar_lander") -> None:
+def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
     """Train or load, then evaluate and render a policy against the selected env."""
 
     set_random_seed(SEED)
@@ -192,6 +237,7 @@ def run_demo(*, train: bool = True, model_path: str = "dqn_lunar_lander") -> Non
     )
     env_name = CUSTOM_ENV_ID if ENV_SELECTION == "custom" else "LunarLander-v3"
     print(f"Using environment: {env_name}")
+    print(f"Using algorithm: {ALGORITHM_SELECTION}")
     if ENV_SELECTION == "custom":
         print(f"Custom options: {CUSTOM_ENV_OPTIONS}")
 
