@@ -43,6 +43,7 @@ class RewardTweaks:
     contact_bonus: float = 0.0
     landing_bonus: float = 0.0
     crash_penalty: float = 0.0
+    fuel_bonus: float = 0.0
 
 
 def _make_lunar_lander(
@@ -89,6 +90,7 @@ class CustomLunarLander(gym.Env):
         random_spawn_x_range: tuple[float, float] = (-0.6, 0.6),
         reward_tweaks: RewardTweaks | None = None,
         noise_std: float = 0.1,
+        max_fuel: int = 300,
     ):
         self.env = _make_lunar_lander(
             render_mode=render_mode,
@@ -105,12 +107,27 @@ class CustomLunarLander(gym.Env):
         self.observation_space = self.env.observation_space
         self.render_mode = render_mode
         self.noise_std = noise_std
+        self.max_fuel = float(max_fuel)
+        self.fuel = self.max_fuel
+        self.main_engine_cost = 1.0
+        self.side_engine_cost = 0.3
+        self._init_observation_space()
+
+    def _init_observation_space(self) -> None:
+        base_space = self.env.observation_space
+        if not isinstance(base_space, gym.spaces.Box):
+            raise TypeError("CustomLunarLander expects a Box observation space")
+
+        low = np.concatenate([base_space.low, np.array([0.0], dtype=base_space.dtype)])
+        high = np.concatenate([base_space.high, np.array([1.0], dtype=base_space.dtype)])
+        self.observation_space = gym.spaces.Box(low=low, high=high, dtype=base_space.dtype)
 
     def _shape_reward(
         self,
         observation,
         reward: float,
         terminated: bool,
+        done: bool,
     ) -> float:
         x, y, vx, vy, angle, angular_velocity, left_contact, right_contact = observation
         shaped_reward = float(reward)
@@ -124,6 +141,10 @@ class CustomLunarLander(gym.Env):
             shaped_reward += self.reward_tweaks.landing_bonus
         elif terminated and reward < 0:
             shaped_reward -= self.reward_tweaks.crash_penalty
+
+        if done and self.max_fuel > 0:
+            fuel_ratio = self.fuel / self.max_fuel
+            shaped_reward += self.reward_tweaks.fuel_bonus * fuel_ratio
 
         return shaped_reward
 
@@ -149,28 +170,64 @@ class CustomLunarLander(gym.Env):
 
         return observation
 
+    def _append_fuel(self, observation):
+        observation = np.asarray(observation, dtype=np.float32)
+        if self.max_fuel <= 0:
+            fuel_ratio = 0.0
+        else:
+            fuel_ratio = float(self.fuel / self.max_fuel)
+        return np.append(observation, fuel_ratio)
+
 
     def step(self, action):
+        fuel_cost = 0.0
+
+        if self.env.unwrapped.continuous:
+            main_throttle = float(np.clip(action[0], 0.0, 1.0))
+            side_throttle = float(np.clip(abs(action[1]), 0.0, 1.0))
+            fuel_cost = (main_throttle * self.main_engine_cost) + (
+                side_throttle * self.side_engine_cost
+            )
+        else:
+            if action == 2:  # main engine
+                fuel_cost = self.main_engine_cost
+            elif action in [1, 3]:  # side engines
+                fuel_cost = self.side_engine_cost
+
+        self.fuel = max(0.0, self.fuel - fuel_cost)
+
+        if self.fuel <= 0:
+            if self.env.unwrapped.continuous:
+                action = np.array([0.0, 0.0], dtype=np.float32)
+            else:
+                action = 0
+
         observation, reward, terminated, truncated, info = self.env.step(action)
         observation = self._add_observation_noise(observation)
-        shaped_reward = self._shape_reward(observation, reward, terminated)
+        done = terminated or truncated
+        shaped_reward = self._shape_reward(observation, reward, terminated, done)
 
         info = dict(info)
         info["base_reward"] = float(reward)
         info["custom_reward"] = shaped_reward
+        observation = self._append_fuel(observation)
         return observation, shaped_reward, terminated, truncated, info
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):
+        self.fuel = self.max_fuel
         # If random_spawn is enabled, always ignore seed to force stochastic resets.
         if self.random_spawn:
             _, info = self.env.reset(options=options)
             self._apply_random_x_spawn()
-            return self._get_state(), info
+            return self._append_fuel(self._get_state()), info
 
         # Otherwise respect the provided seed when present.
         if seed is None:
-            return self.env.reset(options=options)
-        return self.env.reset(seed=seed, options=options)
+            observation, info = self.env.reset(options=options)
+        else:
+            observation, info = self.env.reset(seed=seed, options=options)
+
+        return self._append_fuel(observation), info
 
     def _apply_random_x_spawn(self) -> None:
         base_env = self.env.unwrapped
@@ -201,7 +258,25 @@ class CustomLunarLander(gym.Env):
         ]
 
     def render(self):
-        return self.env.render()
+        render_result = self.env.render()
+
+        if self.render_mode == "human":
+            try:
+                import pygame
+            except Exception:
+                return render_result
+
+            base_env = self.env.unwrapped
+            screen = getattr(base_env, "screen", None)
+            if screen is None:
+                return render_result
+
+            font = pygame.font.Font(None, 24)
+            fuel_text = font.render(f"Fuel: {int(self.fuel)}", True, (255, 255, 255))
+            screen.blit(fuel_text, (10, 10))
+            pygame.display.flip()
+
+        return render_result
 
     def close(self):
         return self.env.close()
