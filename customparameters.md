@@ -1120,3 +1120,682 @@ DQN_KWARGS = {
 
 Evaluated trained agent over 100 episodes: mean reward = 274.88 +/- 81.81
 
+### HyperParameters PPO
+
+#### Baseline PPO
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 202.80 +/- 61.87
+
+#### Run 1 PPO
+
+Changes the number of steps
+
+```python
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 500_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 83.04 +/- 122.09
+
+#### Run 2 PPO
+
+Changes the number of steps
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 5_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 224.48 +/- 38.31
+
+#### Run 3 PPO
+
+Changes the number of steps
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 10_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 251.33 +/- 29.10
+
+#### Run 4 PPO
+
+Changes the learning rate
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 1e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = -63.99 +/- 51.13
+
+#### Run 5 PPO
+
+Changes the learning rate
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 1e-3,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 300.23 +/- 29.29
+
+#### Run 6 PPO
+
+Changes the learning rate
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-3,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 141.70 +/- 126.59
+
+#### Run 7 PPO
+
+Changes the n_steps
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 256,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 207.71 +/- 106.76
+
+#### Run 8 PPO
+
+Changes the n_steps
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 512,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 51.14 +/- 109.46
+
+#### Run 9 PPO
+
+Changes the n_steps
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 2048,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 202.68 +/- 63.63
+
+#### Run 10 PPO
+
+Changes the batch size
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 64,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 217.30 +/- 76.75
+
+#### Run 11 PPO
+
+Changes the batch size
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 128,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 196.22 +/- 75.68
+
+#### Run 12 PPO
+
+Changes the batch size
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 512,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 170.73 +/- 90.23
+
+#### Run 13 PPO
+
+Changes the n_epochs
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 5,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 157.23 +/- 113.91
+
+#### Run 14 PPO
+
+Changes the n_epochs
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 20,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 278.51 +/- 37.11
+
+#### Run 15 PPO
+
+Changes the gamma
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.98,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 79.45 +/- 134.60
+
+#### Run 16 PPO
+
+Changes the gamma
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.5,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 22.62 +/- 175.02
+
+#### Run 17 PPO
+
+Changes the gamma
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 243.47 +/- 21.15
+
+#### Run 18 PPO
+
+Changes the gae_lambda
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.97,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 237.60 +/- 24.09
+
+#### Run 19 PPO
+
+Changes the gae_lambda
+
+```python
+ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+
+SEED = 42
+NUM_ENVS = 16
+NUM_STEPS = 1000
+TOTAL_TIMESTEPS = 1_000_000
+EVAL_EPISODES = 100
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 3e-4,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.90,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 173.91 +/- 115.44
