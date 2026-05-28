@@ -258,7 +258,6 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
         f"Evaluated trained agent over {EVAL_EPISODES} episodes: mean reward = {mean_reward:.2f} +/- {std_reward:.2f}"
     )
 
-    '''
     demo_env = create_vec_env(
         seed=SEED + 2,
         render_mode="human",
@@ -281,14 +280,14 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
             episode += 1
             episode_reward = 0.0
             observation = demo_env.reset()
-    '''
+
     print("Finished running LunarLander-v3")
     if train_env is not None:
         train_env.close()
     eval_env.close()
-    #demo_env.close()
+    demo_env.close()
 
 
 
 if __name__ == "__main__":
-    run_demo(train=True, model_path="runs/custom/custom_baseline.zip")
+    run_demo(train=False, model_path="runs/custom/best_custom_run.zip")

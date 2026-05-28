@@ -30,6 +30,7 @@ Install dependencies:
 python -m pip install gymnasium
 python -m pip install swig
 python -m pip install "gymnasium[box2d]"
+python -m pip install seaborn
 ```
 
 If `conda` is not available in PowerShell, run `conda init powershell` once in Anaconda Prompt or Miniconda Prompt, then reopen PowerShell.
