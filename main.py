@@ -36,7 +36,7 @@ ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
 SEED = 42
 NUM_ENVS = 15
 NUM_STEPS = 1000
-TOTAL_TIMESTEPS = 5_000_000
+TOTAL_TIMESTEPS = 1_000_000
 EVAL_EPISODES = 100
 
 POLICY_KWARGS = {
@@ -258,6 +258,7 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
         f"Evaluated trained agent over {EVAL_EPISODES} episodes: mean reward = {mean_reward:.2f} +/- {std_reward:.2f}"
     )
 
+    '''
     demo_env = create_vec_env(
         seed=SEED + 2,
         render_mode="human",
@@ -280,14 +281,14 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
             episode += 1
             episode_reward = 0.0
             observation = demo_env.reset()
-
+    '''
     print("Finished running LunarLander-v3")
     if train_env is not None:
         train_env.close()
     eval_env.close()
-    demo_env.close()
+    #demo_env.close()
 
 
 
 if __name__ == "__main__":
-    run_demo(train=False, model_path="runs/custom/best_custom_run.zip")
+    run_demo(train=True, model_path="runs/custom/custom_baseline.zip")
