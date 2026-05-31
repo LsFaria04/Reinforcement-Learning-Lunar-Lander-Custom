@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from stable_baselines3 import DQN, PPO
 from stable_baselines3.common.base_class import BaseAlgorithm
+from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.utils import set_random_seed
@@ -33,7 +34,7 @@ CUSTOM_ENV_OPTIONS = {
 
 ALGORITHM_SELECTION = "ppo"  # Options: "dqn", "ppo"
 
-ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
 RUN_BEST_SUITE = False
 
 SEED = 42
@@ -41,6 +42,7 @@ NUM_ENVS = 16
 NUM_STEPS = 1000
 TOTAL_TIMESTEPS = 1_000_000
 EVAL_EPISODES = 100
+CHECKPOINT_PCTS = (5, 10,25,50, 100)
 
 POLICY_KWARGS = {
     "net_arch": [256, 256],
@@ -51,11 +53,11 @@ PPO_KWARGS = {
     "n_steps": 1024,
     "batch_size": 256,
     "n_epochs": 20,
-    "gamma": 0.99,
+    "gamma": 0.995,
     "gae_lambda": 0.95,
     "clip_range": 0.2,
     "ent_coef": 0.01,
-    "vf_coef": 0.5,
+    "vf_coef": 0.7,
     "max_grad_norm": 0.5,
     "policy_kwargs": POLICY_KWARGS,
 }
@@ -98,6 +100,37 @@ class BestRunConfig:
     total_timesteps: int
     num_envs: int
     algo_kwargs: dict
+
+
+class PercentageCheckpointCallback(BaseCallback):
+    def __init__(
+        self,
+        *,
+        total_timesteps: int,
+        percentages: tuple[int, ...],
+        save_dir: Path,
+        prefix: str,
+        verbose: int = 0,
+    ) -> None:
+        super().__init__(verbose)
+        self.total_timesteps = max(1, int(total_timesteps))
+        self.percentages = tuple(sorted(set(p for p in percentages if p > 0)))
+        self.save_dir = save_dir
+        self.prefix = prefix
+        self.saved = set()
+
+    def _on_training_start(self) -> None:
+        self.save_dir.mkdir(parents=True, exist_ok=True)
+
+    def _on_step(self) -> bool:
+        for pct in self.percentages:
+            if pct in self.saved:
+                continue
+            target = int(self.total_timesteps * (pct / 100.0))
+            if self.num_timesteps >= target:
+                self.model.save(self.save_dir / f"{self.prefix}_{pct}pct")
+                self.saved.add(pct)
+        return True
 
 
 
@@ -211,10 +244,32 @@ def train_agent(train_env: VecEnv) -> BaseAlgorithm:
         seed=SEED,
         **algo_kwargs,
     )
+
+    checkpoint_dir = Path("runs") / "checkpoints" / f"{ENV_SELECTION}_{ALGORITHM_SELECTION}"
+    checkpoint_prefix = f"{ENV_SELECTION}_{ALGORITHM_SELECTION}"
+    if 0 in CHECKPOINT_PCTS:
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        model.save(checkpoint_dir / f"{checkpoint_prefix}_0pct")
+
+    mid_pcts = tuple(pct for pct in CHECKPOINT_PCTS if pct not in (0, 100))
+    checkpoint_cb = None
+    if mid_pcts:
+        checkpoint_cb = PercentageCheckpointCallback(
+            total_timesteps=TOTAL_TIMESTEPS,
+            percentages=mid_pcts,
+            save_dir=checkpoint_dir,
+            prefix=checkpoint_prefix,
+        )
+
     model.learn(
         total_timesteps=TOTAL_TIMESTEPS,
         progress_bar=True,
+        callback=checkpoint_cb,
     )
+
+    if 100 in CHECKPOINT_PCTS:
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        model.save(checkpoint_dir / f"{checkpoint_prefix}_100pct")
 
     model.save(save_path)
 
@@ -285,7 +340,7 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
     print(
         f"Evaluated trained agent over {EVAL_EPISODES} episodes: mean reward = {mean_reward:.2f} +/- {std_reward:.2f}"
     )
-    '''
+    
     demo_env = create_vec_env(
         seed=SEED + 2,
         render_mode="human",
@@ -308,14 +363,14 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
             episode += 1
             episode_reward = 0.0
             observation = demo_env.reset()
-    '''
+    
     print("Finished running LunarLander-v3")
     if train_env is not None:
         train_env.close()
     eval_env.close()
-    #demo_env.close()
+    demo_env.close()
 
 
 
 if __name__ == "__main__":
-    run_demo(train=True, model_path="runs/custom/best_custom_run.zip")
+    run_demo(train=False, model_path="runs/checkpoints/original_ppo/original_ppo_100pct")
