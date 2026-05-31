@@ -2073,3 +2073,33 @@ PPO_KWARGS = {
 ```
 
 Evaluated trained agent over 100 episodes: mean reward = 271.48 +/- 28.59
+
+#### Best run ppo
+
+Bets run with ppo
+
+```python
+
+ENV_SELECTION = "original"  # Set to "original" to use the unmodified environment.
+
+POLICY_KWARGS = {
+    "net_arch": [256, 256],
+}
+
+PPO_KWARGS = {
+    "learning_rate": 1e-3,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 20,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.01,
+    "vf_coef": 0.7,
+    "max_grad_norm": 0.5,
+    "policy_kwargs": POLICY_KWARGS,
+}
+
+```
+
+Evaluated trained agent over 100 episodes: mean reward = 282.08 +/- 19.78
