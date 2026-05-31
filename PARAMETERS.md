@@ -1155,7 +1155,7 @@ DQN_KWARGS = {
 
 Evaluated trained agent over 100 episodes: mean reward = 280.60 +/- 22.18
 
-### HyperParameters DQN
+### HyperParameters PPO
 
 #### Baseline PPO
 
