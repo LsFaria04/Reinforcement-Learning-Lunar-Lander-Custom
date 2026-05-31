@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from functools import partial
+from pathlib import Path
 
 import gymnasium as gym
 import numpy as np
@@ -8,7 +10,7 @@ from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.utils import set_random_seed
-from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecMonitor
 
 from environment_creation import (
     create_custom_lunar_lander,
@@ -32,6 +34,7 @@ CUSTOM_ENV_OPTIONS = {
 ALGORITHM_SELECTION = "dqn"  # Options: "dqn", "ppo"
 
 ENV_SELECTION = "custom"  # Set to "original" to use the unmodified environment.
+RUN_BEST_SUITE = False
 
 SEED = 42
 NUM_ENVS = 15
@@ -87,6 +90,16 @@ ALGORITHM_CONFIGS = {
 }
 
 
+@dataclass(frozen=True)
+class BestRunConfig:
+    name: str
+    env_selection: str
+    algorithm: str
+    total_timesteps: int
+    num_envs: int
+    algo_kwargs: dict
+
+
 
 
 def _get_algorithm_config() -> tuple[type[BaseAlgorithm], dict, str]:
@@ -97,6 +110,18 @@ def _get_algorithm_config() -> tuple[type[BaseAlgorithm], dict, str]:
             f"Unknown ALGORITHM_SELECTION={ALGORITHM_SELECTION!r}. Use one of: {valid}."
         )
     return config["cls"], config["kwargs"], config["save_path"]
+
+
+def _get_device_for_algo(algorithm: str) -> str:
+    cuda_available = False
+    try:
+        cuda_available = torch.cuda.is_available()
+    except RuntimeError as exc:
+        print(f"Warning: Could not check CUDA availability due to error: {exc}")
+        print("Defaulting to CPU.")
+    if algorithm == "dqn" and cuda_available:
+        return "cuda"
+    return "cpu"
 
 
 def _make_env_options(*, render_mode: str | None, random_spawn: bool | None) -> dict:
@@ -230,6 +255,9 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
             random_spawn=None,
             num_envs=NUM_ENVS,
         )
+        log_dir = Path("runs") / "logs" / f"{ENV_SELECTION}_{ALGORITHM_SELECTION}"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        train_env = VecMonitor(train_env, str(log_dir))
     eval_env = create_vec_env(
         seed=SEED + 1,
         render_mode=None,
@@ -289,6 +317,134 @@ def run_demo(*, train: bool = True, model_path: str | None = None) -> None:
     #demo_env.close()
 
 
+def run_best_suite() -> None:
+    best_runs = [
+        BestRunConfig(
+            name="original_dqn",
+            env_selection="original",
+            algorithm="dqn",
+            total_timesteps=5_000_000,
+            num_envs=16,
+            algo_kwargs={
+                "learning_rate": 1e-3,
+                "buffer_size": 1_000_000,
+                "learning_starts": 10_000,
+                "batch_size": 128,
+                "tau": 1.0,
+                "gamma": 0.99,
+                "train_freq": 1,
+                "gradient_steps": 1,
+                "target_update_interval": 1_000,
+                "exploration_fraction": 0.1,
+                "exploration_final_eps": 0.05,
+                "max_grad_norm": 10.0,
+                "policy_kwargs": {"net_arch": [256, 256]},
+            },
+        ),
+        BestRunConfig(
+            name="original_ppo",
+            env_selection="original",
+            algorithm="ppo",
+            total_timesteps=1_000_000,
+            num_envs=16,
+            algo_kwargs={
+                "learning_rate": 1e-3,
+                "n_steps": 1024,
+                "batch_size": 256,
+                "n_epochs": 10,
+                "gamma": 0.99,
+                "gae_lambda": 0.95,
+                "clip_range": 0.2,
+                "ent_coef": 0.0,
+                "vf_coef": 0.5,
+                "max_grad_norm": 0.5,
+                "policy_kwargs": {"net_arch": [256, 256]},
+            },
+        ),
+        BestRunConfig(
+            name="custom_dqn",
+            env_selection="custom",
+            algorithm="dqn",
+            total_timesteps=10_000_000,
+            num_envs=15,
+            algo_kwargs={
+                "learning_rate": 1e-3,
+                "buffer_size": 1_000_000,
+                "learning_starts": 10_000,
+                "batch_size": 64,
+                "tau": 1.0,
+                "gamma": 0.99,
+                "train_freq": 1,
+                "gradient_steps": 1,
+                "target_update_interval": 1_000,
+                "exploration_fraction": 0.1,
+                "exploration_final_eps": 0.05,
+                "max_grad_norm": 10.0,
+                "policy_kwargs": {"net_arch": [256, 256]},
+            },
+        ),
+    ]
+
+    for run_cfg in best_runs:
+        global ENV_SELECTION, ALGORITHM_SELECTION
+        ENV_SELECTION = run_cfg.env_selection
+        ALGORITHM_SELECTION = run_cfg.algorithm
+
+        set_random_seed(SEED)
+        np.random.seed(SEED)
+        torch.manual_seed(SEED)
+
+        train_env = create_vec_env(
+            seed=SEED,
+            render_mode=None,
+            random_spawn=None,
+            num_envs=run_cfg.num_envs,
+        )
+        log_dir = Path("runs") / "logs" / run_cfg.name
+        log_dir.mkdir(parents=True, exist_ok=True)
+        train_env = VecMonitor(train_env, str(log_dir))
+
+        eval_env = create_vec_env(
+            seed=SEED + 1,
+            render_mode=None,
+            random_spawn=False,
+            num_envs=1,
+            use_subproc=False,
+        )
+
+        model_cls = DQN if run_cfg.algorithm == "dqn" else PPO
+        device = _get_device_for_algo(run_cfg.algorithm)
+        model = model_cls(
+            "MlpPolicy",
+            train_env,
+            verbose=0,
+            device=device,
+            seed=SEED,
+            **run_cfg.algo_kwargs,
+        )
+        model.learn(total_timesteps=run_cfg.total_timesteps, progress_bar=True)
+
+        save_dir = Path("runs") / "best"
+        save_dir.mkdir(parents=True, exist_ok=True)
+        model.save(save_dir / run_cfg.name)
+
+        mean_reward, std_reward = evaluate_policy(
+            model,
+            eval_env,
+            n_eval_episodes=EVAL_EPISODES,
+            deterministic=True,
+        )
+        print(
+            f"Best run {run_cfg.name}: mean reward = {mean_reward:.2f} +/- {std_reward:.2f}"
+        )
+
+        train_env.close()
+        eval_env.close()
+
+
 
 if __name__ == "__main__":
-    run_demo(train=True, model_path="runs/custom/custom_baseline.zip")
+    if RUN_BEST_SUITE:
+        run_best_suite()
+    else:
+        run_demo(train=True, model_path="runs/custom/custom_baseline.zip")
